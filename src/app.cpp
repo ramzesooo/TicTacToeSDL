@@ -7,7 +7,7 @@ App::App(const char* title, int width, int height)
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
-		std::cout << "Failed to load a game: " << SDL_GetError() << "\n";
+		std::cout << "Failed to init SDL: " << SDL_GetError() << "\n";
 		return;
 	}
 
@@ -44,14 +44,15 @@ App::App(const char* title, int width, int height)
 
 App::~App()
 {
+	Clean();
 	std::cout << "Destroyed the game\n";
 }
 
 void App::Init()
 {
-	manager->LoadTexture("square", "assets/square_32x32.png");
-	manager->LoadTexture("circle", "assets/circle.png");
-	manager->LoadTexture("cross", "assets/cross.png");
+	manager->LoadTexture(square, "assets/square_32x32.png");
+	manager->LoadTexture(circle, "assets/circle.png");
+	manager->LoadTexture(cross, "assets/cross.png");
 
 	manager->Log();
 
@@ -66,18 +67,26 @@ void App::Init()
 	uint32_t posX = startX;
 	uint32_t posY = startY;
 
+	uint16_t UUID = 0;
+
 	for (uint32_t y = 0; y < boardSizeY; ++y)
 	{
 		for (uint32_t x = 0; x < boardSizeX; ++x)
 		{
-			Board board;
-			board.idX = x;
-			board.idY = y;
-			board.dest.x = posX + (size * x);
-			board.dest.y = posY + (size * y);
-			board.dest.w = board.dest.h = size;
-			board.content = "square";
-			theBoard.push_back(board);
+			theBoard[UUID] = new Board();
+
+			theBoard[UUID]->idX = x;
+			theBoard[UUID]->idY = y;
+
+			theBoard[UUID]->dest.x = posX + (size * x);
+			theBoard[UUID]->dest.y = posY + (size * y);
+			theBoard[UUID]->dest.w = theBoard[UUID]->dest.h = size;
+
+			theBoard[UUID]->src.x = theBoard[UUID]->src.y = 0;
+			theBoard[UUID]->src.w = theBoard[UUID]->src.h = size;
+
+			theBoard[UUID]->content = square;
+			UUID++;
 		}
 	}
 
@@ -116,7 +125,45 @@ void App::EventHandler()
 
 void App::Update()
 {
+	// 0 == square
+	// 1 == circle
+	// 2 == cross
+	// if (0) == if (false)
+	if (winner)
+	{
+		return;
+	}
 
+	CheckWinner();
+
+	uint16_t UUID = rand() % 9;
+	uint32_t rnd = rand() % 2;
+	contents newContent = square;
+
+	switch (rnd)
+	{
+	case 0:
+		newContent = circle;
+		break;
+	case 1:
+		newContent = cross;
+		break;
+	default:
+		newContent = square;
+		break;
+	}
+
+	for (auto& board : theBoard)
+	{
+		if (board.first == UUID)
+		{
+			if (board.second && board.second->content == square)
+			{
+				board.second->content = newContent;
+			}
+			break;
+		}
+	}
 }
 
 void App::Render()
@@ -128,13 +175,18 @@ void App::Render()
 
 void App::Clean()
 {
+	for (auto& val : theBoard)
+	{
+		delete val.second;
+		val.second = nullptr;
+	}
+
 	if (manager)
 	{
 		delete manager;
 		manager = nullptr;
 	}
 	
-	bIsRunning = false;
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
@@ -166,9 +218,65 @@ void App::HandleKeyDown()
 
 void App::DrawBoard()
 {
-	for (auto it = theBoard.begin(); it != theBoard.end(); ++it)
+	for (auto& board : theBoard)
 	{
-		printf("idX: %d, idY: %d, ", it->idX, it->idY);
-		manager->Draw(it->content.c_str(), it->dest);
+		if (board.second)
+		{
+			manager->Draw(board.second->content, &board.second->src, &board.second->dest);
+		}
+	}
+}
+
+void App::CheckWinner()
+{
+	// code to fix
+	for (uint16_t y = 0; y < 3; y++)
+	{
+		uint16_t x = 3 * y;
+		if (theBoard[0 + x]->content == square || theBoard[1 + x]->content == square || theBoard[2 + x]->content == square)
+		{
+			continue;
+		}
+
+		if (theBoard[0+x]->content == theBoard[1+x]->content && theBoard[1+x]->content == theBoard[2+x]->content)
+		{
+			winner = theBoard[0 + x]->content;
+			Finish();
+			return;
+		}
+	}
+
+	for (const auto& board : theBoard)
+	{
+		if (board.second->content == square)
+		{
+			std::cout << "Still can make a move!\n";
+			return;
+		}
+	}
+
+	winner = tie;
+	Finish();
+}
+
+void App::Finish()
+{
+	switch (winner)
+	{
+	case square:
+		std::cout << "Something's wrong!!" << std::endl;
+		Clean();
+		break;
+	case circle:
+		std::cout << "Circle is the winner!" << std::endl;
+		break;
+	case cross:
+		std::cout << "Cross is the winner!" << std::endl;
+		break;
+	case tie:
+		std::cout << "Nobody won!" << std::endl;
+		break;
+	default:
+		break;
 	}
 }

@@ -25,6 +25,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\app.h" />
+    <ClInclude Include="src\additional.h" />
     <ClInclude Include="src\manager.h" />
   </ItemGroup>
   <ItemGroup>

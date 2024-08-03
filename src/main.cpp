@@ -3,6 +3,8 @@
 
 int main(int argc, char** args)
 {
+	srand(static_cast<uint32_t>(time(NULL)));
+
 	std::unique_ptr<App> app = std::make_unique<App>("TicTacToe", 800, 600);
 
 	while (app->GetRunningState())

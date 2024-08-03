@@ -8,7 +8,9 @@ public:
 	~Manager();
 
 	void LoadTexture(const char* textureID, const char* path);
-	void Draw(const char* textureID, SDL_Rect dest);
+	void LoadTexture(contents textureID, const char* path);
+	void Draw(const char* textureID, SDL_Rect* src, SDL_Rect* dest);
+	void Draw(contents textureID, SDL_Rect* src, SDL_Rect* dest);
 
 	void Log();
 private:

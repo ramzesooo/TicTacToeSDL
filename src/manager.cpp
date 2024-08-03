@@ -36,25 +36,57 @@ void Manager::LoadTexture(const char* textureID, const char* path)
 	SDL_FreeSurface(tempSurface);
 
 	textures.emplace(textureID, texture);
-
-	return;
 }
 
-void Manager::Draw(const char* textureID, SDL_Rect dest)
+void Manager::LoadTexture(contents textureID, const char* path)
 {
-	auto it = textures.find(textureID);
+	SDL_Surface* tempSurface = IMG_Load(path);
+	if (!tempSurface)
+	{
+		std::cout << "Failed to load a image: " << SDL_GetError() << "\n";
+		return;
+	}
 
-	if (it == textures.end())
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, tempSurface);
+	if (!texture)
+	{
+		std::cout << "Failed to load a image: " << SDL_GetError() << "\n";
+		return;
+	}
+
+	SDL_FreeSurface(tempSurface);
+
+	textures.emplace(std::to_string(textureID), texture);
+}
+
+void Manager::Draw(const char* textureID, SDL_Rect* src, SDL_Rect* dest)
+{
+	//auto it = textures.find(textureID);
+	std::string s_textureID = textureID;
+	auto it = textures[s_textureID];
+
+	if (!it)
+	//if (it == textures.end())
 	{
 		std::cout << "Texture \"" << textureID << "\" doesn't exist";
 		return;
 	}
 
-	SDL_Rect src = { 0, 0, 32, 32 };
+	SDL_RenderCopyEx(renderer, it, src, dest, NULL, NULL, SDL_FLIP_NONE);
+}
 
-	printf("x: %d, y: %d, w: %d, h: %d\n", dest.x, dest.y, dest.w, dest.h);
+void Manager::Draw(contents textureID, SDL_Rect* src, SDL_Rect* dest)
+{
+	//auto it = textures.find(textureID);
+	auto it = textures[std::to_string(textureID)];
 
-	SDL_RenderCopyEx(renderer, it->second, &src, &dest, NULL, NULL, SDL_FLIP_NONE);
+	if (!it)
+	{
+		std::cout << "Texture \"" << textureID << "\" doesn't exist";
+		return;
+	}
+
+	SDL_RenderCopyEx(renderer, it, src, dest, NULL, NULL, SDL_FLIP_NONE);
 }
 
 void Manager::Log()
