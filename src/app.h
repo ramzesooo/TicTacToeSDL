@@ -18,7 +18,7 @@ public:
 	App(const char* title, int width, int height);
 	~App();
 
-	void Init();
+	bool Init();
 	void Clean();
 
 	SDL_Renderer* GetRenderer() const;

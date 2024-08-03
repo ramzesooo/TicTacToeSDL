@@ -32,14 +32,10 @@ App::App(const char* title, int width, int height)
 		return;
 	}
 
-	manager = new Manager(renderer);
-
 	SDL_RenderSetVSync(renderer, 1);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
-	bIsRunning = true;
-
-	Init();
+	bIsRunning = Init();
 }
 
 App::~App()
@@ -48,8 +44,10 @@ App::~App()
 	std::cout << "Destroyed the game\n";
 }
 
-void App::Init()
+bool App::Init()
 {
+	manager = new Manager(renderer);
+
 	manager->LoadTexture(square, "assets/square_32x32.png");
 	manager->LoadTexture(circle, "assets/circle.png");
 	manager->LoadTexture(cross, "assets/cross.png");
@@ -91,6 +89,7 @@ void App::Init()
 	}
 
 	std::cout << "The game has been loaded\n";
+	return true;
 }
 
 SDL_Renderer* App::GetRenderer() const
@@ -125,10 +124,9 @@ void App::EventHandler()
 
 void App::Update()
 {
-	// 0 == square
+	// 0 == square == false
 	// 1 == circle
 	// 2 == cross
-	// if (0) == if (false)
 	if (winner)
 	{
 		return;
@@ -153,33 +151,6 @@ void App::Update()
 	default:
 		break;
 	}
-
-	/*contents newContent = square;
-
-	switch (rnd)
-	{
-	case 0:
-		newContent = circle;
-		break;
-	case 1:
-		newContent = cross;
-		break;
-	default:
-		newContent = square;
-		break;
-	}
-
-	for (auto& board : theBoard)
-	{
-		if (board.first == UUID)
-		{
-			if (board.second && board.second->content == square)
-			{
-				board.second->content = newContent;
-			}
-			break;
-		}
-	}*/
 }
 
 void App::Render()
@@ -191,10 +162,10 @@ void App::Render()
 
 void App::Clean()
 {
-	for (auto& val : theBoard)
+	for (auto& board : theBoard)
 	{
-		delete val.second;
-		val.second = nullptr;
+		delete board.second;
+		board.second = nullptr;
 	}
 
 	if (manager)
@@ -203,6 +174,7 @@ void App::Clean()
 		manager = nullptr;
 	}
 	
+	bIsRunning = false;
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
@@ -225,7 +197,7 @@ void App::HandleKeyDown()
 	switch (event.key.keysym.sym)
 	{
 	case SDLK_ESCAPE:
-		this->Clean();
+		bIsRunning = false;
 		break;
 	default:
 		break;
@@ -236,10 +208,12 @@ void App::DrawBoard()
 {
 	for (auto& board : theBoard)
 	{
-		if (board.second)
+		if (!board.second)
 		{
-			manager->Draw(board.second->content, &board.second->src, &board.second->dest);
+			std::cout << "Can't draw the board if there is missing any..." << std::endl;
+			break;
 		}
+		manager->Draw(board.second->content, &board.second->src, &board.second->dest);
 	}
 }
 
@@ -249,12 +223,12 @@ void App::CheckWinner()
 	for (uint16_t y = 0; y < 3; y++)
 	{
 		uint16_t x = 3 * y;
-		if (theBoard[0 + x]->content == square || theBoard[1 + x]->content == square || theBoard[2 + x]->content == square)
+		if (!theBoard[0 + x] || !theBoard[1 + x] || !theBoard[2 + x] || theBoard[0 + x]->content == square || theBoard[1 + x]->content == square || theBoard[2 + x]->content == square)
 		{
 			continue;
 		}
 
-		if (theBoard[0+x]->content == theBoard[1+x]->content && theBoard[1+x]->content == theBoard[2+x]->content)
+		if (theBoard[0 + x]->content == theBoard[1 + x]->content && theBoard[1 + x]->content == theBoard[2 + x]->content)
 		{
 			winner = theBoard[0 + x]->content;
 			Finish();
@@ -264,7 +238,7 @@ void App::CheckWinner()
 
 	for (const auto& board : theBoard)
 	{
-		if (board.second->content == square)
+		if (board.second && board.second->content == square)
 		{
 			std::cout << "Still can make a move!\n";
 			return;

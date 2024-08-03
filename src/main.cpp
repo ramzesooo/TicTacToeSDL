@@ -14,5 +14,7 @@ int main(int argc, char** args)
 		app->Render();
 	}
 
+	printf("Last catched error from SDL: %s\n", SDL_GetError());
+
 	return 0;
 }

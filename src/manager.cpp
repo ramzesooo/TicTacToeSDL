@@ -10,7 +10,6 @@ Manager::~Manager()
 {
 	for (const auto& val : textures)
 	{
-		std::cout << "Destroying " << val.first <<"\n";
 		SDL_DestroyTexture(val.second);
 	}
 
