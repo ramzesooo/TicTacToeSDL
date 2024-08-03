@@ -137,8 +137,24 @@ void App::Update()
 	CheckWinner();
 
 	uint16_t UUID = rand() % 9;
-	uint32_t rnd = rand() % 2;
-	contents newContent = square;
+	uint32_t rnd = rand() % 2 + 1;
+
+	switch (rnd)
+	{
+	case 0:
+		theBoard[UUID]->content = square;
+		break;
+	case 1:
+		theBoard[UUID]->content = circle;
+		break;
+	case 2:
+		theBoard[UUID]->content = cross;
+		break;
+	default:
+		break;
+	}
+
+	/*contents newContent = square;
 
 	switch (rnd)
 	{
@@ -163,7 +179,7 @@ void App::Update()
 			}
 			break;
 		}
-	}
+	}*/
 }
 
 void App::Render()
