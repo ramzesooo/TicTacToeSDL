@@ -3,7 +3,7 @@
 
 Manager::Manager(SDL_Renderer* renderer) : renderer(renderer)
 {
-	std::cout << "Created a manager\n";
+	std::cout << "Created the manager\n";
 }
 
 Manager::~Manager()
@@ -13,7 +13,7 @@ Manager::~Manager()
 		SDL_DestroyTexture(val.second);
 	}
 
-	std::cout << "Destroyed a manager\n";
+	std::cout << "Destroyed the manager\n";
 }
 
 void Manager::LoadTexture(const char* textureID, const char* path)
@@ -60,12 +60,10 @@ void Manager::LoadTexture(contents textureID, const char* path)
 
 void Manager::Draw(const char* textureID, SDL_Rect* src, SDL_Rect* dest)
 {
-	//auto it = textures.find(textureID);
 	std::string s_textureID = textureID;
 	auto it = textures[s_textureID];
 
 	if (!it)
-	//if (it == textures.end())
 	{
 		std::cout << "Texture \"" << textureID << "\" doesn't exist";
 		return;
@@ -76,7 +74,6 @@ void Manager::Draw(const char* textureID, SDL_Rect* src, SDL_Rect* dest)
 
 void Manager::Draw(contents textureID, SDL_Rect* src, SDL_Rect* dest)
 {
-	//auto it = textures.find(textureID);
 	auto it = textures[std::to_string(textureID)];
 
 	if (!it)

@@ -37,15 +37,14 @@ public:
 private:
 	SDL_Event event;
 public:
-	// associated to rendering
-	void DrawBoard();
-
-	// associated to updating
-	void CheckWinner();
+	// Update:
+	bool CheckWinner(); // returns true if gotta stop the game or got a winner
 	void Finish();
+
+	// Render:
+	void DrawBoard();
 private:
 	std::unordered_map<uint16_t, Board*> theBoard;
-	std::vector<uint16_t> boardX, boardY;
 	Manager* manager = nullptr;
 	contents winner = square; // will return null
 };
@@ -54,6 +53,5 @@ struct Board
 {
 	SDL_Rect src{ 0, 0, 32, 32 };
 	SDL_Rect dest{ 0, 0, 32, 32 };
-	uint8_t idX = 0, idY = 0; // posX & posY on the board (for example x == 0 && y == 0 means it's the first square)
 	contents content = square;
 };

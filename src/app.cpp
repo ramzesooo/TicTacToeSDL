@@ -54,34 +54,28 @@ bool App::Init()
 
 	manager->Log();
 
-	uint32_t boardSizeX = 3;
-	uint32_t boardSizeY = 3;
+	uint32_t size = 32; // size to display
 
-	uint32_t size = 32;
-
-	uint32_t startX = (400 - (size / 2)) - (size * (boardSizeX - 3)); // TODO: fix this terrible math
-	uint32_t startY = (300 - (size / 2)) - (size * (boardSizeY - 3)); // TODO: fix this terrible math
+	uint32_t startX = (400 - (size / 2)) - size; // TODO: fix this terrible math
+	uint32_t startY = (300 - (size / 2)) - size; // TODO: fix this terrible math
 
 	uint32_t posX = startX;
 	uint32_t posY = startY;
 
 	uint16_t UUID = 0;
 
-	for (uint32_t y = 0; y < boardSizeY; ++y)
+	for (uint32_t y = 0; y < 3; ++y)
 	{
-		for (uint32_t x = 0; x < boardSizeX; ++x)
+		for (uint32_t x = 0; x < 3; ++x)
 		{
 			theBoard[UUID] = new Board();
-
-			theBoard[UUID]->idX = x;
-			theBoard[UUID]->idY = y;
 
 			theBoard[UUID]->dest.x = posX + (size * x);
 			theBoard[UUID]->dest.y = posY + (size * y);
 			theBoard[UUID]->dest.w = theBoard[UUID]->dest.h = size;
 
 			theBoard[UUID]->src.x = theBoard[UUID]->src.y = 0;
-			theBoard[UUID]->src.w = theBoard[UUID]->src.h = size;
+			theBoard[UUID]->src.w = theBoard[UUID]->src.h = 32; // image is 32x32
 
 			theBoard[UUID]->content = square;
 			UUID++;
@@ -127,29 +121,30 @@ void App::Update()
 	// 0 == square == false
 	// 1 == circle
 	// 2 == cross
-	if (winner)
+	if (winner || CheckWinner())
 	{
 		return;
 	}
 
-	CheckWinner();
-
 	uint16_t UUID = rand() % 9;
-	uint32_t rnd = rand() % 2 + 1;
 
-	switch (rnd)
+	if (theBoard[UUID]->content == square)
 	{
-	case 0:
-		theBoard[UUID]->content = square;
-		break;
-	case 1:
-		theBoard[UUID]->content = circle;
-		break;
-	case 2:
-		theBoard[UUID]->content = cross;
-		break;
-	default:
-		break;
+		uint32_t rnd = rand() % 2 + 1;
+		switch (rnd)
+		{
+		case 0:
+			theBoard[UUID]->content = square;
+			break;
+		case 1:
+			theBoard[UUID]->content = circle;
+			break;
+		case 2:
+			theBoard[UUID]->content = cross;
+			break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -176,7 +171,9 @@ void App::Clean()
 	
 	bIsRunning = false;
 	SDL_DestroyRenderer(renderer);
+	renderer = nullptr;
 	SDL_DestroyWindow(window);
+	window = nullptr;
 	SDL_Quit();
 	std::cout << "Cleaned the game\n";
 }
@@ -204,49 +201,86 @@ void App::HandleKeyDown()
 	}
 }
 
-void App::DrawBoard()
+bool App::CheckWinner() // need to be optimized
 {
-	for (auto& board : theBoard)
-	{
-		if (!board.second)
-		{
-			std::cout << "Can't draw the board if there is missing any..." << std::endl;
-			break;
-		}
-		manager->Draw(board.second->content, &board.second->src, &board.second->dest);
-	}
-}
-
-void App::CheckWinner()
-{
-	// code to fix
-	for (uint16_t y = 0; y < 3; y++)
-	{
-		uint16_t x = 3 * y;
-		if (!theBoard[0 + x] || !theBoard[1 + x] || !theBoard[2 + x] || theBoard[0 + x]->content == square || theBoard[1 + x]->content == square || theBoard[2 + x]->content == square)
-		{
-			continue;
-		}
-
-		if (theBoard[0 + x]->content == theBoard[1 + x]->content && theBoard[1 + x]->content == theBoard[2 + x]->content)
-		{
-			winner = theBoard[0 + x]->content;
-			Finish();
-			return;
-		}
-	}
+	// check for existing all places and is the board filled already
+	bool bAbleToMove = false;
 
 	for (const auto& board : theBoard)
 	{
-		if (board.second && board.second->content == square)
+		if (!board.second)
 		{
-			std::cout << "Still can make a move!\n";
-			return;
+			std::cout << "Missing a place in the board!" << std::endl;
+			Clean();
+			return true;
+		}
+		else
+		{
+			if (board.second->content == square)
+			{
+				bAbleToMove = true;
+				break;
+			}
 		}
 	}
 
-	winner = tie;
-	Finish();
+	// board:
+	// 0, 1, 2
+	// 3, 4, 5
+	// 6, 7, 8
+
+	// check horizontal possibilites
+	for (uint16_t i = 0; i < 3; ++i)
+	{
+		uint16_t UUID = 3 * i; // horizontal
+		if (!theBoard[UUID]->content == square)
+		{
+			if (theBoard[UUID]->content == theBoard[1 + UUID]->content && theBoard[1 + UUID]->content == theBoard[2 + UUID]->content)
+			{
+				winner = theBoard[UUID]->content;
+				Finish();
+				return true;
+			}
+		}
+
+		UUID = i; // vertical
+		if (!theBoard[UUID]->content == square)
+		{
+			if (theBoard[UUID]->content == theBoard[3 + UUID]->content && theBoard[3 + UUID]->content == theBoard[6 + UUID]->content)
+			{
+				winner = theBoard[UUID]->content;
+				Finish();
+				return true;
+			}
+		}
+	}
+
+	for (uint16_t i = 0; i < 2; ++i) // diagonally
+	{
+		// 0, 4, 8
+		// 2, 4, 6
+		uint16_t UUID = 4;
+		if (theBoard[4]->content == square)
+		{
+			break;
+		}
+
+		if (theBoard[(UUID - 4 * i) * i]->content == theBoard[4]->content && theBoard[4]->content == theBoard[(UUID + 4 * (1 - i)) * (1 - i)]->content)
+		{
+			winner = theBoard[4]->content;
+			Finish();
+			return true;
+		}
+	}
+
+	if (!bAbleToMove)
+	{
+		winner = tie;
+		Finish();
+		return true;
+	}
+
+	return false;
 }
 
 void App::Finish()
@@ -268,5 +302,19 @@ void App::Finish()
 		break;
 	default:
 		break;
+	}
+}
+
+
+void App::DrawBoard()
+{
+	for (auto& board : theBoard)
+	{
+		if (!board.second)
+		{
+			std::cout << "Can't draw the board if there is missing any..." << std::endl;
+			break;
+		}
+		manager->Draw(board.second->content, &board.second->src, &board.second->dest);
 	}
 }
