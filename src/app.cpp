@@ -77,9 +77,6 @@ bool App::Init()
 			theBoard[UUID]->dest.y = posY + (size * y);
 			theBoard[UUID]->dest.w = theBoard[UUID]->dest.h = size;
 
-			//theBoard[UUID]->src.x = theBoard[UUID]->src.y = 0;
-			//theBoard[UUID]->src.w = theBoard[UUID]->src.h = 32; // image is 32x32
-
 			theBoard[UUID]->content = square;
 			theBoard[UUID]->UUID = UUID;
 			UUID++;
@@ -117,6 +114,9 @@ void App::EventHandler()
 		break;
 	case SDL_KEYDOWN:
 		HandleKeyDown();
+		break;
+	case SDL_MOUSEBUTTONDOWN:
+		OnLPM(m_event.button.x, m_event.button.y);
 		break;
 	default:
 		break;
@@ -192,6 +192,18 @@ void App::HandleKeyDown()
 		break;
 	default:
 		break;
+	}
+}
+
+void App::OnLPM(uint32_t x, uint32_t y)
+{
+	for (const auto& board : theBoard)
+	{
+		if (x < board.second->dest.x + board.second->dest.w && x >= board.second->dest.x
+			&& y >= board.second->dest.y && y < board.second->dest.y + board.second->dest.h)
+		{
+			printf("#%d: (%d, %d)\n", board.first, board.second->dest.x, board.second->dest.y);
+		}
 	}
 }
 

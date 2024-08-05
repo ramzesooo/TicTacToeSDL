@@ -40,6 +40,7 @@ private:
 	SDL_Event m_event;
 public:
 	// Update:
+	void OnLPM(uint32_t x, uint32_t y);
 	bool CheckWinner(); // returns true if gotta don't execute Update() or got a winner
 	void Finish();
 
