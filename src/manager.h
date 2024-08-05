@@ -9,9 +9,8 @@ public:
 
 	void LoadTexture(const char* textureID, const char* path);
 	void LoadTexture(contents textureID, const char* path);
-	void Draw(const char* textureID, SDL_Rect* src, SDL_Rect* dest);
-	void Draw(contents textureID, SDL_Rect* src, SDL_Rect* dest);
-	void Draw(const char* textureID, SDL_Rect* src, SDL_Rect* dest, double angle);
+	void Draw(const char* textureID, SDL_Rect* src, SDL_Rect* dest, double angle = 0);
+	void Draw(contents textureID, SDL_Rect* src, SDL_Rect* dest, double angle = 0);
 
 	void Log();
 private:

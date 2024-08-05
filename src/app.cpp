@@ -3,6 +3,8 @@
 
 App::App(const char* title, int width, int height)
 {
+	SDL_PollEvent(&m_event);
+
 	std::cout << "Loading game..." << std::endl;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -98,11 +100,14 @@ bool App::GetRunningState() const
 	return bIsRunning;
 }
 
+SDL_Event* App::GetEvent()
+{
+	return &m_event;
+}
+
 void App::EventHandler()
 {
-	SDL_PollEvent(&event);
-
-	switch (event.type)
+	switch (m_event.type)
 	{
 	case SDL_QUIT:
 		bIsRunning = false;
@@ -128,41 +133,18 @@ void App::Update()
 		return;
 	}
 
-	/*uint16_t UUID = rand() % 9;
-
-	if (theBoard[UUID]->content == square)
-	{
-		uint32_t rnd = rand() % 2 + 1;
-		switch (rnd)
-		{
-		case 0:
-			theBoard[UUID]->content = square;
-			break;
-		case 1:
-			theBoard[UUID]->content = circle;
-			break;
-		case 2:
-			theBoard[UUID]->content = cross;
-			break;
-		default:
-			break;
-		}
-	}*/
-
-	theBoard[0]->content = circle;
-	theBoard[1]->content = circle;
-	theBoard[2]->content = circle;
+	
 }
 
 void App::Render()
 {
 	SDL_RenderClear(renderer);
 
-	DrawBoard();
 	if (winner)
 	{
 		DrawWinnerLine();
 	}
+	DrawBoard();
 
 	SDL_RenderPresent(renderer);
 }
@@ -192,7 +174,7 @@ void App::Clean()
 
 void App::HandleKeyUp()
 {
-	/*switch (event.key.keysym.sym)
+	/*switch (m_event.key.keysym.sym)
 	{
 	case 0:
 		break;
@@ -203,7 +185,7 @@ void App::HandleKeyUp()
 
 void App::HandleKeyDown()
 {
-	switch (event.key.keysym.sym)
+	switch (m_event.key.keysym.sym)
 	{
 	case SDLK_ESCAPE:
 		bIsRunning = false;
@@ -241,7 +223,7 @@ bool App::CheckWinner() // need to be optimized
 	// 3, 4, 5
 	// 6, 7, 8
 
-	// check horizontal possibilites
+	// check horizontal and vertical possibilites
 	for (uint16_t i = 0; i < 3; ++i)
 	{
 		uint16_t UUID = 3 * i; // horizontal
@@ -250,7 +232,6 @@ bool App::CheckWinner() // need to be optimized
 			if (theBoard[UUID]->content == theBoard[1 + UUID]->content && theBoard[1 + UUID]->content == theBoard[2 + UUID]->content)
 			{
 				winner = theBoard[UUID]->content;
-				lineActive = true;
 				lineAngle = 90;
 				lineDest.x = theBoard[UUID]->dest.x + lineDest.w;
 				lineDest.y = theBoard[UUID]->dest.y - lineDest.w;
@@ -265,7 +246,6 @@ bool App::CheckWinner() // need to be optimized
 			if (theBoard[UUID]->content == theBoard[3 + UUID]->content && theBoard[3 + UUID]->content == theBoard[6 + UUID]->content)
 			{
 				winner = theBoard[UUID]->content;
-				lineActive = true;
 				lineAngle = 0;
 				lineDest.x = theBoard[UUID]->dest.x;
 				lineDest.y = theBoard[UUID]->dest.y;
@@ -279,7 +259,6 @@ bool App::CheckWinner() // need to be optimized
 	{
 		// 0, 4, 8
 		// 2, 4, 6
-		uint16_t UUID = 4;
 		if (theBoard[4]->content == square)
 		{
 			break;
@@ -294,22 +273,12 @@ bool App::CheckWinner() // need to be optimized
 		if (b1->content == b2->content && b2->content == b3->content)
 		{
 			winner = theBoard[4]->content;
-			
-			// for 2, 4, 6
-			//lineDest.x = b1->dest.x - lineDest.w;
-			//lineDest.y = b1->dest.y - (lineDest.w / 2);
-			//lineAngle = 45;
-
-			// for 0, 4, 8
-			//lineDest.x = b1->dest.x + lineDest.w;
-			//lineDest.y = b1->dest.y - (lineDest.w / 2);
 
 			lineDest.x = b1->dest.x + lineDest.w * (1 - 2 * i);
 			lineDest.y = b1->dest.y - (lineDest.w / 2);
 			lineAngle = 45 * (3 - 2 * i);
 			lineDest.h = 32 * 4; // * 4 because of the angle :)
 
-			lineActive = true;
 			Finish();
 			return true;
 		}
@@ -362,8 +331,5 @@ void App::DrawBoard()
 
 void App::DrawWinnerLine()
 {
-	if (lineActive)
-	{
-		manager->Draw("line", &this->src, &lineDest, lineAngle);
-	}
+	manager->Draw("line", &this->src, &lineDest, lineAngle);
 }

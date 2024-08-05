@@ -28,6 +28,8 @@ private:
 	SDL_Renderer* renderer = nullptr;
 	bool bIsRunning = false;
 public:
+	SDL_Event* GetEvent();
+
 	void EventHandler();
 	void Update();
 	void Render();
@@ -35,7 +37,7 @@ public:
 	void HandleKeyUp();
 	void HandleKeyDown();
 private:
-	SDL_Event event;
+	SDL_Event m_event;
 public:
 	// Update:
 	bool CheckWinner(); // returns true if gotta don't execute Update() or got a winner
@@ -52,7 +54,6 @@ private:
 private:
 	SDL_Rect lineDest{ 0, 0, 32, 96 }; // for winning line
 	double lineAngle = 0;
-	bool lineActive = false;
 };
 
 struct Board

@@ -10,6 +10,7 @@ Manager::~Manager()
 {
 	for (const auto& val : textures)
 	{
+		std::cout << "Destroying texture: " << val.first << "\n";
 		SDL_DestroyTexture(val.second);
 	}
 
@@ -58,33 +59,6 @@ void Manager::LoadTexture(contents textureID, const char* path)
 	textures.emplace(std::to_string(textureID), texture);
 }
 
-void Manager::Draw(const char* textureID, SDL_Rect* src, SDL_Rect* dest)
-{
-	std::string s_textureID = textureID;
-	auto it = textures[s_textureID];
-
-	if (!it)
-	{
-		std::cout << "Texture \"" << textureID << "\" doesn't exist";
-		return;
-	}
-
-	SDL_RenderCopyEx(renderer, it, src, dest, NULL, NULL, SDL_FLIP_NONE);
-}
-
-void Manager::Draw(contents textureID, SDL_Rect* src, SDL_Rect* dest)
-{
-	auto it = textures[std::to_string(textureID)];
-
-	if (!it)
-	{
-		std::cout << "Texture \"" << textureID << "\" doesn't exist";
-		return;
-	}
-
-	SDL_RenderCopyEx(renderer, it, src, dest, NULL, NULL, SDL_FLIP_NONE);
-}
-
 void Manager::Draw(const char* textureID, SDL_Rect* src, SDL_Rect* dest, double angle)
 {
 	std::string s_textureID = textureID;
@@ -98,6 +72,20 @@ void Manager::Draw(const char* textureID, SDL_Rect* src, SDL_Rect* dest, double 
 
 	SDL_RenderCopyEx(renderer, it, src, dest, angle, NULL, SDL_FLIP_NONE);
 }
+
+void Manager::Draw(contents textureID, SDL_Rect* src, SDL_Rect* dest, double angle)
+{
+	auto it = textures[std::to_string(textureID)];
+
+	if (!it)
+	{
+		std::cout << "Texture \"" << textureID << "\" doesn't exist";
+		return;
+	}
+
+	SDL_RenderCopyEx(renderer, it, src, dest, angle, NULL, SDL_FLIP_NONE);
+}
+
 
 void Manager::Log()
 {
