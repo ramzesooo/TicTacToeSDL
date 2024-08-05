@@ -85,6 +85,20 @@ void Manager::Draw(contents textureID, SDL_Rect* src, SDL_Rect* dest)
 	SDL_RenderCopyEx(renderer, it, src, dest, NULL, NULL, SDL_FLIP_NONE);
 }
 
+void Manager::Draw(const char* textureID, SDL_Rect* src, SDL_Rect* dest, double angle)
+{
+	std::string s_textureID = textureID;
+	auto it = textures[s_textureID];
+
+	if (!it)
+	{
+		std::cout << "Texture \"" << textureID << "\" doesn't exist";
+		return;
+	}
+
+	SDL_RenderCopyEx(renderer, it, src, dest, angle, NULL, SDL_FLIP_NONE);
+}
+
 void Manager::Log()
 {
 	std::cout << "Loaded textures:" << std::endl;

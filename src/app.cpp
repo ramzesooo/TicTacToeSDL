@@ -51,6 +51,7 @@ bool App::Init()
 	manager->LoadTexture(square, "assets/square_32x32.png");
 	manager->LoadTexture(circle, "assets/circle.png");
 	manager->LoadTexture(cross, "assets/cross.png");
+	manager->LoadTexture("line", "assets/line.png");
 
 	manager->Log();
 
@@ -74,10 +75,11 @@ bool App::Init()
 			theBoard[UUID]->dest.y = posY + (size * y);
 			theBoard[UUID]->dest.w = theBoard[UUID]->dest.h = size;
 
-			theBoard[UUID]->src.x = theBoard[UUID]->src.y = 0;
-			theBoard[UUID]->src.w = theBoard[UUID]->src.h = 32; // image is 32x32
+			//theBoard[UUID]->src.x = theBoard[UUID]->src.y = 0;
+			//theBoard[UUID]->src.w = theBoard[UUID]->src.h = 32; // image is 32x32
 
 			theBoard[UUID]->content = square;
+			theBoard[UUID]->UUID = UUID;
 			UUID++;
 		}
 	}
@@ -126,7 +128,7 @@ void App::Update()
 		return;
 	}
 
-	uint16_t UUID = rand() % 9;
+	/*uint16_t UUID = rand() % 9;
 
 	if (theBoard[UUID]->content == square)
 	{
@@ -145,13 +147,23 @@ void App::Update()
 		default:
 			break;
 		}
-	}
+	}*/
+
+	theBoard[0]->content = circle;
+	theBoard[1]->content = circle;
+	theBoard[2]->content = circle;
 }
 
 void App::Render()
 {
 	SDL_RenderClear(renderer);
+
 	DrawBoard();
+	if (winner)
+	{
+		DrawWinnerLine();
+	}
+
 	SDL_RenderPresent(renderer);
 }
 
@@ -238,6 +250,10 @@ bool App::CheckWinner() // need to be optimized
 			if (theBoard[UUID]->content == theBoard[1 + UUID]->content && theBoard[1 + UUID]->content == theBoard[2 + UUID]->content)
 			{
 				winner = theBoard[UUID]->content;
+				lineActive = true;
+				lineAngle = 90;
+				lineDest.x = theBoard[UUID]->dest.x + lineDest.w;
+				lineDest.y = theBoard[UUID]->dest.y - lineDest.w;
 				Finish();
 				return true;
 			}
@@ -249,6 +265,10 @@ bool App::CheckWinner() // need to be optimized
 			if (theBoard[UUID]->content == theBoard[3 + UUID]->content && theBoard[3 + UUID]->content == theBoard[6 + UUID]->content)
 			{
 				winner = theBoard[UUID]->content;
+				lineActive = true;
+				lineAngle = 0;
+				lineDest.x = theBoard[UUID]->dest.x;
+				lineDest.y = theBoard[UUID]->dest.y;
 				Finish();
 				return true;
 			}
@@ -265,9 +285,31 @@ bool App::CheckWinner() // need to be optimized
 			break;
 		}
 
-		if (theBoard[(UUID - 4 * i) * i]->content == theBoard[4]->content && theBoard[4]->content == theBoard[(UUID + 4 * (1 - i)) * (1 - i)]->content)
+		// i = 0: 0, 4, 8
+		// i = 1: 2, 4, 6
+		Board* b1 = theBoard[2 * i];
+		Board* b2 = theBoard[4];
+		Board* b3 = theBoard[8 - 2 * i];
+
+		if (b1->content == b2->content && b2->content == b3->content)
 		{
 			winner = theBoard[4]->content;
+			
+			// for 2, 4, 6
+			//lineDest.x = b1->dest.x - lineDest.w;
+			//lineDest.y = b1->dest.y - (lineDest.w / 2);
+			//lineAngle = 45;
+
+			// for 0, 4, 8
+			//lineDest.x = b1->dest.x + lineDest.w;
+			//lineDest.y = b1->dest.y - (lineDest.w / 2);
+
+			lineDest.x = b1->dest.x + lineDest.w * (1 - 2 * i);
+			lineDest.y = b1->dest.y - (lineDest.w / 2);
+			lineAngle = 45 * (3 - 2 * i);
+			lineDest.h = 32 * 4; // * 4 because of the angle :)
+
+			lineActive = true;
 			Finish();
 			return true;
 		}
@@ -305,16 +347,23 @@ void App::Finish()
 	}
 }
 
-
 void App::DrawBoard()
 {
-	for (auto& board : theBoard)
+	for (const auto& board : theBoard)
 	{
 		if (!board.second)
 		{
 			std::cout << "Can't draw the board if there is missing any..." << std::endl;
 			break;
 		}
-		manager->Draw(board.second->content, &board.second->src, &board.second->dest);
+		manager->Draw(board.second->content, &this->src, &board.second->dest);
+	}
+}
+
+void App::DrawWinnerLine()
+{
+	if (lineActive)
+	{
+		manager->Draw("line", &this->src, &lineDest, lineAngle);
 	}
 }

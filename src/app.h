@@ -38,20 +38,26 @@ private:
 	SDL_Event event;
 public:
 	// Update:
-	bool CheckWinner(); // returns true if gotta stop the game or got a winner
+	bool CheckWinner(); // returns true if gotta don't execute Update() or got a winner
 	void Finish();
 
 	// Render:
 	void DrawBoard();
+	void DrawWinnerLine();
 private:
 	std::unordered_map<uint16_t, Board*> theBoard;
 	Manager* manager = nullptr;
-	contents winner = square; // will return null
+	contents winner = square; // returns false
+	SDL_Rect src{ 0, 0, 32, 32 }; // used for Board struct, it's the same every time, so doesn't need to put it into the struct
+private:
+	SDL_Rect lineDest{ 0, 0, 32, 96 }; // for winning line
+	double lineAngle = 0;
+	bool lineActive = false;
 };
 
 struct Board
 {
-	SDL_Rect src{ 0, 0, 32, 32 };
 	SDL_Rect dest{ 0, 0, 32, 32 };
 	contents content = square;
+	uint16_t UUID = 0;
 };
