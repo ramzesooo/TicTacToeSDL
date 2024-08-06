@@ -120,13 +120,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\User\OneDrive\Pulpit\pliki pliki pliki\cos tam\SDL2\SDL2\include;C:\Users\User\OneDrive\Pulpit\pliki pliki pliki\cos tam\SDL2\SDL2_image-2.8.2\include;C:\Users\User\OneDrive\Pulpit\pliki pliki pliki\cos tam\SDL2\SDL2_ttf-2.22.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dep\SDL2\include;$(SolutionDir)dep\SDL2_image\include;$(SolutionDir)dep\SDL2_ttf\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\User\OneDrive\Pulpit\pliki pliki pliki\cos tam\SDL2\SDL2\lib\x64;C:\Users\User\OneDrive\Pulpit\pliki pliki pliki\cos tam\SDL2\SDL2_image-2.8.2\lib\x64;C:\Users\User\OneDrive\Pulpit\pliki pliki pliki\cos tam\SDL2\SDL2_ttf-2.22.0\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)dep\SDL2\lib\x64;$(SolutionDir)dep\SDL2_image\lib\x64;$(SolutionDir)dep\SDL2_ttf\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -138,14 +138,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\User\OneDrive\Pulpit\pliki pliki pliki\cos tam\SDL2\SDL2\include;C:\Users\User\OneDrive\Pulpit\pliki pliki pliki\cos tam\SDL2\SDL2_image-2.8.2\include;C:\Users\User\OneDrive\Pulpit\pliki pliki pliki\cos tam\SDL2\SDL2_ttf-2.22.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dep\SDL2\include;$(SolutionDir)dep\SDL2_image\include;$(SolutionDir)dep\SDL2_ttf\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\User\OneDrive\Pulpit\pliki pliki pliki\cos tam\SDL2\SDL2\lib\x64;C:\Users\User\OneDrive\Pulpit\pliki pliki pliki\cos tam\SDL2\SDL2_image-2.8.2\lib\x64;C:\Users\User\OneDrive\Pulpit\pliki pliki pliki\cos tam\SDL2\SDL2_ttf-2.22.0\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)dep\SDL2\lib\x64;$(SolutionDir)dep\SDL2_image\lib\x64;$(SolutionDir)dep\SDL2_ttf\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
