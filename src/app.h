@@ -39,8 +39,10 @@ public:
 private:
 	SDL_Event m_event;
 public:
+	// EventHandler:
+	void OnLPM(int x, int y);
+
 	// Update:
-	void OnLPM(uint32_t x, uint32_t y);
 	bool CheckWinner(); // returns true if gotta don't execute Update() or got a winner
 	void Finish();
 
@@ -48,11 +50,13 @@ public:
 	void DrawBoard();
 	void DrawWinnerLine();
 private:
+	SDL_Color white{ 255, 255, 255, 255 };
+	SDL_Color green{ 30, 255, 30, 255 };
+	contents nextTurn = circle;
 	std::unordered_map<uint16_t, Board*> theBoard;
 	Manager* manager = nullptr;
 	contents winner = square; // returns false
 	SDL_Rect src{ 0, 0, 32, 32 }; // used for Board struct, it's the same every time, so doesn't need to put it into the struct
-private:
 	SDL_Rect lineDest{ 0, 0, 32, 96 }; // for winning line
 	double lineAngle = 0;
 };

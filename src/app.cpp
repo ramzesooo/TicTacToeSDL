@@ -55,6 +55,10 @@ bool App::Init()
 	manager->LoadTexture(cross, "assets/cross.png");
 	manager->LoadTexture("line", "assets/line.png");
 
+	manager->LoadFont("default", "assets/F25_Bank_Printer.ttf", 16);
+
+	manager->CreateLabel("default", "text", 300, 130, &white, "mainInfo");
+
 	manager->Log();
 
 	uint32_t size = 32; // size to display
@@ -133,18 +137,26 @@ void App::Update()
 		return;
 	}
 
-	
+	std::string turnInfo = "";
+	if (nextTurn == circle)
+	{
+		turnInfo = "Now it's O's turn!";
+	}
+	else
+	{
+		turnInfo = "Now it's X's turn!";
+	}
+	manager->UpdateLabelText(turnInfo, "mainInfo", &white);
 }
 
 void App::Render()
 {
 	SDL_RenderClear(renderer);
 
-	if (winner)
-	{
-		DrawWinnerLine();
-	}
 	DrawBoard();
+	DrawWinnerLine();
+
+	manager->DrawLabel("mainInfo");
 
 	SDL_RenderPresent(renderer);
 }
@@ -195,19 +207,32 @@ void App::HandleKeyDown()
 	}
 }
 
-void App::OnLPM(uint32_t x, uint32_t y)
+void App::OnLPM(int x, int y)
 {
+	if (winner)
+	{
+		return;
+	}
+
 	for (const auto& board : theBoard)
 	{
-		if (x < board.second->dest.x + board.second->dest.w && x >= board.second->dest.x
-			&& y >= board.second->dest.y && y < board.second->dest.y + board.second->dest.h)
+		if (x > board.second->dest.x + board.second->dest.w || x < board.second->dest.x
+			|| y > board.second->dest.y + board.second->dest.h || y < board.second->dest.y)
 		{
-			printf("#%d: (%d, %d)\n", board.first, board.second->dest.x, board.second->dest.y);
+			continue;
 		}
+
+		if (board.second->content != square)
+		{
+			return;
+		}
+
+		board.second->content = nextTurn;
+		nextTurn = static_cast<contents>(nextTurn ^ 3); // 1 ^ 3 = 2, 2 ^ 3 = 1
 	}
 }
 
-bool App::CheckWinner() // need to be optimized
+bool App::CheckWinner() // needs to be optimized
 {
 	// check for existing all places and is the board filled already
 	bool bAbleToMove = false;
@@ -308,6 +333,8 @@ bool App::CheckWinner() // need to be optimized
 
 void App::Finish()
 {
+	std::string newLabelText = "";
+
 	switch (winner)
 	{
 	case square:
@@ -316,16 +343,24 @@ void App::Finish()
 		break;
 	case circle:
 		std::cout << "Circle is the winner!" << std::endl;
+		newLabelText = "O is the winner!";
+		manager->UpdateLabelPos("mainInfo", 320, 130);
 		break;
 	case cross:
 		std::cout << "Cross is the winner!" << std::endl;
+		newLabelText = "X is the winner!";
+		manager->UpdateLabelPos("mainInfo", 320, 130);
 		break;
 	case tie:
 		std::cout << "Nobody won!" << std::endl;
+		newLabelText = "TIE!";
+		manager->UpdateLabelPos("mainInfo", 380, 130);
 		break;
 	default:
 		break;
 	}
+
+	manager->UpdateLabelText(newLabelText, "mainInfo", &green);
 }
 
 void App::DrawBoard()
@@ -337,11 +372,14 @@ void App::DrawBoard()
 			std::cout << "Can't draw the board if there is missing any..." << std::endl;
 			break;
 		}
-		manager->Draw(board.second->content, &this->src, &board.second->dest);
+		manager->DrawTexture(board.second->content, &this->src, &board.second->dest);
 	}
 }
 
 void App::DrawWinnerLine()
 {
-	manager->Draw("line", &this->src, &lineDest, lineAngle);
+	if (winner)
+	{
+		manager->DrawTexture("line", &this->src, &lineDest, lineAngle);
+	}
 }
