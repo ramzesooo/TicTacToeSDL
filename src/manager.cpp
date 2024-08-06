@@ -157,17 +157,24 @@ void Manager::DrawLabel(std::string labelID)
 
 void Manager::Log()
 {
-	std::cout << "Loaded textures:" << std::endl;
+	std::cout << "\nLoaded textures:" << std::endl;
 
 	for (const auto& texture : textures)
 	{
 		std::cout << texture.first << "\n";
 	}
 
-	std::cout << "Loaded fonts:" << std::endl;
+	std::cout << "\nLoaded fonts:" << std::endl;
 
 	for (const auto& font : fonts)
 	{
 		std::cout << font.first << "\n";
+	}
+
+	std::cout << "\nCreated labels:" << std::endl;
+	
+	for (const auto& label : labels)
+	{
+		std::cout << label.first << "\n";
 	}
 }

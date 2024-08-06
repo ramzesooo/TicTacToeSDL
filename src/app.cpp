@@ -229,6 +229,7 @@ void App::OnLPM(int x, int y)
 
 		board.second->content = nextTurn;
 		nextTurn = static_cast<contents>(nextTurn ^ 3); // 1 ^ 3 = 2, 2 ^ 3 = 1
+		break;
 	}
 }
 
