@@ -22,8 +22,10 @@
     <ClCompile Include="src\app.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\manager.cpp" />
+    <ClCompile Include="src\menu.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\menu.h" />
     <ClInclude Include="src\app.h" />
     <ClInclude Include="src\additional.h" />
     <ClInclude Include="src\labels.h" />

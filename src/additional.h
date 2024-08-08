@@ -1,5 +1,6 @@
 #pragma once
-enum contents {
+enum class contents : uint32_t
+{
 	square = 0,
 	circle,
 	cross,

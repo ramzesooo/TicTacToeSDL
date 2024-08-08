@@ -10,7 +10,8 @@
 #include "additional.h"
 
 class Manager;
-struct Board;
+class MainMenu;
+struct BoardTile;
 
 class App
 {
@@ -22,11 +23,24 @@ public:
 	void Clean();
 
 	SDL_Renderer* GetRenderer() const;
-	bool GetRunningState() const;
+	bool IsGameRunning() const;
+	void SetGameState(bool newState);
+	bool IsMenuRunning() const;
+	void SetMenuState(bool newState);
+
+	int WINDOW_WIDTH = 800;
+	int WINDOW_HEIGHT = 600;
 private:
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
 	bool bIsRunning = false;
+	bool bIsMenuShowing = true;
+// main menu begin
+public:
+	void Menu(); // this method triggers all needed for menu's functionality
+private:
+	MainMenu* menu = nullptr; // pointer to MainMenu class
+// main menu end
 public:
 	SDL_Event* GetEvent();
 
@@ -49,21 +63,22 @@ public:
 	// Render:
 	void DrawBoard();
 	void DrawWinnerLine();
-private:
+
 	SDL_Color white{ 255, 255, 255, 255 };
 	SDL_Color green{ 30, 255, 30, 255 };
-	contents nextTurn = circle;
-	std::unordered_map<uint16_t, Board*> theBoard;
+private:
+	contents nextTurn = contents::circle;
+	std::unordered_map<uint16_t, BoardTile*> boardTiles;
 	Manager* manager = nullptr;
-	contents winner = square; // returns false
-	SDL_Rect src{ 0, 0, 32, 32 }; // used for Board struct, it's the same every time, so doesn't need to put it into the struct
-	SDL_Rect lineDest{ 0, 0, 32, 96 }; // for winning line
+	contents winner = contents::square; // NULL by default (contents::square)
+	SDL_Rect src{ 0, 0, 32, 32 }; // used for BoardTile struct, it's the same every time, so doesn't need to put it into the struct
+	SDL_Rect lineDest{ 0, 0, 32, 96 }; // for drawing the line of win
 	double lineAngle = 0;
 };
 
-struct Board
+struct BoardTile
 {
 	SDL_Rect dest{ 0, 0, 32, 32 };
-	contents content = square;
+	contents content = contents::square;
 	uint16_t UUID = 0;
 };

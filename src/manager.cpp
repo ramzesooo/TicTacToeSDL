@@ -2,7 +2,7 @@
 #include "labels.h"
 #include <iostream>
 
-Manager::Manager(SDL_Renderer* renderer) : renderer(renderer)
+Manager::Manager(SDL_Renderer* rendererPtr, App* appPtr) : renderer(rendererPtr), app(appPtr)
 {
 	std::cout << "Created the manager\n";
 }
@@ -58,7 +58,7 @@ void Manager::LoadTexture(const char* textureID, const char* path)
 	textures.emplace(textureID, texture);
 }
 
-void Manager::LoadTexture(contents textureID, const char* path)
+void Manager::LoadTexture(uint32_t textureID, const char* path)
 {
 	SDL_Surface* tempSurface = IMG_Load(path);
 	if (!tempSurface)
@@ -82,7 +82,7 @@ void Manager::LoadTexture(contents textureID, const char* path)
 void Manager::DrawTexture(const char* textureID, SDL_Rect* src, SDL_Rect* dest, double angle)
 {
 	std::string s_textureID = textureID;
-	auto it = textures[s_textureID];
+	auto it = textures[textureID];
 
 	if (!it)
 	{
@@ -93,7 +93,7 @@ void Manager::DrawTexture(const char* textureID, SDL_Rect* src, SDL_Rect* dest, 
 	SDL_RenderCopyEx(renderer, it, src, dest, angle, NULL, SDL_FLIP_NONE);
 }
 
-void Manager::DrawTexture(contents textureID, SDL_Rect* src, SDL_Rect* dest, double angle)
+void Manager::DrawTexture(uint32_t textureID, SDL_Rect* src, SDL_Rect* dest, double angle)
 {
 	auto it = textures[std::to_string(textureID)];
 
@@ -118,6 +118,7 @@ void Manager::CreateLabel(std::string fontID, std::string text, uint32_t x, uint
 	label->text = text;
 	label->pos.x = x;
 	label->pos.y = y;
+	label->color = color;
 	SDL_Surface* surface = TTF_RenderText_Blended(fonts[fontID], text.c_str(), *color);
 	label->tex = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
@@ -145,6 +146,23 @@ void Manager::UpdateLabelPos(std::string labelID, uint32_t x, uint32_t y)
 	labels[labelID]->pos.y = y;
 }
 
+void Manager::CenterLabelX(std::string labelID)
+{
+	labels[labelID]->pos.x = (app->WINDOW_WIDTH / 2) - (labels[labelID]->pos.w / 2);
+}
+
+void Manager::UpdateFont(std::string labelID, std::string newFontID)
+{
+	if (!fonts[newFontID])
+	{
+		std::cout << "Manager::UpdateFont: Font " << newFontID << " doesn't exist!";
+		return;
+	}
+
+	labels[labelID]->fontID = newFontID;
+	UpdateLabelText(labels[labelID]->text, labelID, labels[labelID]->color);
+}
+
 SDL_Rect* Manager::GetLabelRect(std::string labelID)
 {
 	return &labels[labelID]->pos;
@@ -152,6 +170,12 @@ SDL_Rect* Manager::GetLabelRect(std::string labelID)
 
 void Manager::DrawLabel(std::string labelID)
 {
+	if (!labels[labelID])
+	{
+		std::cout << "Manager::DrawLabel: Couldn't find label called " << labelID << std::endl;
+		return;
+	}
+
 	SDL_RenderCopy(renderer, labels[labelID]->tex, nullptr, &labels[labelID]->pos);
 }
 
