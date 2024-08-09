@@ -6,7 +6,7 @@ struct Label;
 class Manager
 {
 public:
-	Manager(SDL_Renderer* renderer, App* appPtr);
+	Manager(SDL_Renderer* rendererPtr, App* appPtr);
 	~Manager();
 
 	void LoadTexture(const char* textureID, const char* path);

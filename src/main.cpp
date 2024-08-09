@@ -3,8 +3,6 @@
 
 int main(int argc, char** args)
 {
-	srand(static_cast<uint32_t>(time(NULL)));
-
 	App app{ "TicTacToe", 800, 600 };
 
 	while (app.IsGameRunning())
