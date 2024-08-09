@@ -23,6 +23,7 @@ App::App(const char* title, int width, int height)
 
 	SDL_Surface* iconSurface = IMG_Load("assets/icon.png");
 	SDL_SetWindowIcon(window, iconSurface);
+	SDL_FreeSurface(iconSurface);
 
 	renderer = SDL_CreateRenderer(window, -1, 0);
 	if (!renderer)

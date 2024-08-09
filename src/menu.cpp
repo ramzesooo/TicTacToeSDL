@@ -68,6 +68,12 @@ MainMenu::~MainMenu()
 		button = nullptr;
 	}
 
+	for (auto& button : settingsButtons)
+	{
+		delete button;
+		button = nullptr;
+	}
+
 	std::cout << "Menu destroyed" << std::endl;
 }
 
