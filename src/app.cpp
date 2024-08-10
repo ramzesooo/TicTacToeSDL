@@ -64,12 +64,12 @@ bool App::Init()
 	manager->LoadFont("defaultXL", "assets/F25_Bank_Printer.ttf", 24);
 	manager->LoadFont("Rostack", "assets/rostack.otf", 36);
 
-	manager->CreateLabel("default", "text", 300, 130, &white, "mainInfo");
+	manager->CreateLabel("default", "text", 300, 130, &white, "turnInfo");;
 
 	uint32_t size = 32; // size to display
 
-	uint32_t startX = (400 - (size / 2)) - size; // TODO: fix this terrible math
-	uint32_t startY = (300 - (size / 2)) - size; // TODO: fix this terrible math
+	uint32_t startX = ((WINDOW_WIDTH / 2) - (size / 2)) - size; // TODO: fix this terrible math
+	uint32_t startY = ((WINDOW_HEIGHT / 2) - (size / 2)) - size; // TODO: fix this terrible math
 
 	uint32_t posX = startX;
 	uint32_t posY = startY;
@@ -179,7 +179,8 @@ void App::Update()
 		turnInfo = "Now it's X's turn!";
 	}
 
-	manager->UpdateLabelText(turnInfo, "mainInfo", &white);
+	manager->UpdateLabelText(turnInfo, "turnInfo", &white);
+	manager->CenterLabelX("turnInfo");
 }
 
 void App::Render()
@@ -189,7 +190,7 @@ void App::Render()
 	DrawBoard();
 	DrawWinnerLine();
 
-	manager->DrawLabel("mainInfo");
+	manager->DrawLabel("turnInfo");
 
 	SDL_RenderPresent(renderer);
 }
@@ -284,7 +285,7 @@ bool App::CheckWinner() // needs to be optimized
 		if (!tile.second)
 		{
 			std::cout << "Missing a place in the board!" << std::endl;
-			Clean();
+			bIsRunning = false;
 			return true;
 		}
 
@@ -384,23 +385,21 @@ void App::Finish()
 	case contents::circle:
 		std::cout << "Circle is the winner!" << std::endl;
 		newLabelText = "O is the winner!";
-		manager->UpdateLabelPos("mainInfo", 320, 130);
 		break;
 	case contents::cross:
 		std::cout << "Cross is the winner!" << std::endl;
 		newLabelText = "X is the winner!";
-		manager->UpdateLabelPos("mainInfo", 320, 130);
 		break;
 	case contents::tie:
 		std::cout << "Nobody won!" << std::endl;
 		newLabelText = "TIE!";
-		manager->UpdateLabelPos("mainInfo", 380, 130);
 		break;
 	default:
 		break;
 	}
 
-	manager->UpdateLabelText(newLabelText, "mainInfo", &green);
+	manager->UpdateLabelText(newLabelText, "turnInfo", &green);
+	manager->CenterLabelX("turnInfo");
 }
 
 void App::DrawBoard()
@@ -421,5 +420,31 @@ void App::DrawWinnerLine()
 	if ((uint32_t)winner)
 	{
 		manager->DrawTexture("line", &this->src, &lineDest, lineAngle);
+	}
+}
+
+void App::AdjustToResolution()
+{
+	uint32_t size = 32; // size to display
+
+	uint32_t startX = ((WINDOW_WIDTH / 2) - (size / 2)) - size; // TODO: fix this terrible math
+	uint32_t startY = ((WINDOW_HEIGHT / 2) - (size / 2)) - size; // TODO: fix this terrible math
+
+	uint32_t posX = startX;
+	uint32_t posY = startY;
+
+	uint16_t UUID = 0;
+
+	for (uint32_t y = 0; y < 3; ++y)
+	{
+		for (uint32_t x = 0; x < 3; ++x)
+		{
+			boardTiles[UUID]->dest.x = posX + (size * x);
+			boardTiles[UUID]->dest.y = posY + (size * y);
+			boardTiles[UUID]->dest.w = boardTiles[UUID]->dest.h = size;
+
+			boardTiles[UUID]->UUID = UUID;
+			UUID++;
+		}
 	}
 }

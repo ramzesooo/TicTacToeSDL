@@ -278,6 +278,7 @@ void MainMenu::OnLPM()
 		}
 		else if (hoveredButton->labelID == "SaveSettings")
 		{
+			// if the resolution stays the same, then don't continue
 			if (app->WINDOW_WIDTH == resolutions[currentResolution].x && app->WINDOW_HEIGHT == resolutions[currentResolution].y)
 			{
 				return;
@@ -291,6 +292,7 @@ void MainMenu::OnLPM()
 			SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
 			manager->CenterLabelX("gameName");
+
 			for (const auto& button : primaryButtons)
 			{
 				manager->CenterLabelX(button->labelID);
@@ -300,6 +302,8 @@ void MainMenu::OnLPM()
 			{
 				manager->CenterLabelX(button->labelID);
 			}
+
+			app->AdjustToResolution();
 		}
 		else if (hoveredButton->labelID == "BackSettings")
 		{

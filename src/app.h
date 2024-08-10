@@ -63,6 +63,8 @@ public:
 	void DrawBoard();
 	void DrawWinnerLine();
 
+	void AdjustToResolution();
+
 	SDL_Color white{ 255, 255, 255, 255 };
 	SDL_Color green{ 30, 255, 30, 255 };
 private:
